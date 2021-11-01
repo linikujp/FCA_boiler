@@ -1,0 +1,165 @@
+id,concept_name
+0,anthrax_vaccine; cell_free_filtrate; live_attenuated; anthrax_vaccine_adsorbed_(AVA); anthrax_vaccine_precipitated_(AVP); Russian_anthrax_vaccine_(STI_1_strain); China_anthrax_vaccine_(A16R_strain); cholera_vaccine; inactivated_whole_cell; oral; diphtheria_vaccine; toxoid; haemophilus_influenzae_B_vaccine; pure_polysaccharide; polysaccharide_conjugate; HbOC; PRP_D; PRP_OMP; PRP_T; booster_only_dose; meningococcal_vaccine; recombinant_protein; MPSV4; quadrivalent; bivalent; MenACWY_D; MenACWY_CRM; MenACWY_TT; MenB_4C; MenB_FHbp; pertussis_vaccine; acellular; plague_vaccine; pneumococcal_vaccine; PPSV14; PPSV23; PCV7; PCV10; PCV13; PCV15; PCV20; tetanus_vaccine; diptheria_vaccine; diptheria_and_tetanus_toxoid_vaccine; Td_(adult_formulation); DT_(pediatric_formulation); pertusis_vaccine; diphtheria_toxoid; tetanus_toxoid; Acellular_Pertussis; Tdap_(adult_formulation); DTaP_(pediatric_formulation); haemophilus_influenzae_B_polysaccharide_conjugate; DTaP_Hib; tuberculosis_vaccine; Bacillus_CalmetteÃ¢â‚¬â€œGuÃƒÂ©rin_(BCG)_vaccine; typhoid_vaccine; capsular_polysaccaride; conjugate; Ty21a; ViCPS; Vi_TT; typhus_vaccine; covid_19_vaccine; inactivated_whole_virus; protein_subunit; mRNA; viral_vector; DNA; mRNA_1273; mRNA_BNT162b2; rS_ChAdOx1; rS_Ad26; ebola_vaccine; encephalitis_vaccine; influenza_vaccine; hepatitis_A_vaccine; pediatric; adult; hepatitis_B_vaccine; plasma_derived; recombinant_surface_antigen; pediatric_adolescent; dialysis; adult_CpG_adjuvanted; measles_vaccine; mumps_vaccine; rubella_vaccine; varicella_zoster_vaccine; purified_antigen; varicella_vaccine; polio_vaccine; inactivated; trivalent; oral_monovalent; oral_bivalent; oral_trivalent; rabies_vaccine; cell_culture; embryonated_egg_based; purified_duck_embrio_vaccine; primary_hampster_kidney_cell; purified_vero; human_diploid_cell; purified_chick_embryo_cell; rota_vaccine; RV5; RV1; RA_27/3_strain; yellow_fever_vaccine; 17D_204_strain; 17DD_strain; papilloma_virus_vaccine; L1_protein; HPV2; HPV4; HPV9; Inactivated_poliovirus_vaccine; DTapP_IPV; recombinant_surface_antigen_HepB_vaccine; DTaP_IPV_HepB; haemophilus_influenzae_B; DTaP_IPV_Hib; DTP_Hib
+1,"anthrax vaccine, cell free filtrate, anthrax vaccine adsorbed (AVA)"
+2,"anthrax vaccine, cell free filtrate, anthrax vaccine precipitated (AVP)"
+3,"anthrax vaccine, live attenuated, Russian (STI-1 strain)"
+4,"anthrax vaccine, live attenuated, China (A16R strain)"
+5,"cholera vaccine, inactivated whole cell"
+6,"cholera vaccine, live attenuated, oral"
+7,"diphtheria vaccine, toxoid"
+8,"haemophilus influenzae B vaccine, pure polysaccharide"
+9,"haemophilus influenzae B vaccine, polysaccharide conjugated to diphtheria mutant carrier protein CRM197 (HbOC)"
+10,"haemophilus influenzae B vaccine, polysaccharide conjugated to diphtheria toxoid (PRP-D)"
+11,"haemophilus influenzae B vaccine, polysaccharide conjugated to Neisseria meningitidis outer membrane protein (PRP-OMP)"
+12,"haemophilus influenzae B vaccine, polysaccharide conjugated to tetanus toxoid (PRP-T), booster only dose"
+13,"meningococcal vaccine, pure polysaccharide, MPSV4"
+14,"meningococcal vaccine, polysaccharide conjugate, quadrivalent, MenACWY-D"
+15,"meningococcal vaccine, polysaccharide conjugate, quadrivalent, MenACWY-CRM"
+16,"meningococcal vaccine, polysaccharide conjugate, quadrivalent, MenACWY-TT"
+17,"meningococcal vaccine, recombinant protein, MenB-4C"
+18,"meningococcal vaccine, recombinant protein, MenB-FHbp"
+19,"pertussis vaccine, acellular"
+20,"pertussis vaccine, inactivated whole cell"
+21,"plague vaccine, inactivated whole cell"
+22,"plague vaccine, live attenuated"
+23,"plague vaccine, recombinant protein"
+24,"pneumococcal vaccine, pure polysaccharide, PPSV14"
+25,"pneumococcal vaccine, pure polysaccharide, PPSV23"
+26,"pneumococcal vaccine, polysaccharide conjugate, PCV7"
+27,"pneumococcal vaccine, polysaccharide conjugate, PCV10"
+28,"pneumococcal vaccine, polysaccharide conjugate, PCV13"
+29,"pneumococcal vaccine, polysaccharide conjugate, PCV15"
+30,"pneumococcal vaccine, polysaccharide conjugate, PCV20"
+31,"tetanus vaccine, toxoid"
+32,"diptheria tetanus combination vaccine, diptheria and tetanus toxoid, Td (adult formulation)"
+33,"diptheria tetanus combination vaccine, diptheria and tetanus toxoid, DT (pediatric formulation)"
+34,"diphtheria tetanus pertussis vaccine, diphtheria toxoid tetanus toxoid Acellular Pertussis, Tdap (adult formulation)"
+35,DTaP-Hib
+36,Bacillus CalmetteÃ¢â‚¬â€œGuÃƒÂ©rin (BCG) vaccine
+37,"typhoid vaccine, live attenuated, Ty21a"
+38,"typhoid vaccine, live attenuated, ViCPS"
+39,"typhoid vaccine, live attenuated, Vi-TT"
+40,typhus vaccine
+41,"covid-19 vaccine, live attenuated"
+42,"covid-19 vaccine, inactivated whole virus"
+43,"covid-19 vaccine, protein subunit"
+44,"covid-19 vaccine, DNA"
+45,"covid-19 vaccine, mRNA-1273"
+46,"covid-19 vaccine, mRNA-BNT162b2"
+47,"covid-19 vaccine, rS-ChAdOx1"
+48,"covid-19 vaccine, rS-Ad26"
+49,ebola vaccine
+50,encephalitis vaccine
+51,influenza vaccine
+52,"hepatitis A vaccine, live attenuated"
+53,"hepatitis A vaccine, inactivated whole virus, pediatric"
+54,"hepatitis A vaccine, inactivated whole virus, adult"
+55,"hepatitis B vaccine, plasma derived"
+56,"hepatitis B vaccine, recombinant surface antigen, pediatric-adolescent"
+57,"hepatitis B vaccine, recombinant surface antigen, dialysis"
+58,"hepatitis B vaccine, recombinant surface antigen, adult CpG adjuvanted"
+59,"zoster (shingles) vaccine, purified antigen"
+60,live attenuated MMRV
+61,"polio vaccine, inactivated, trivalent"
+62,"polio vaccine, live attenuated, oral monovalent"
+63,"polio vaccine, live attenuated, oral bivalent"
+64,"polio vaccine, live attenuated, oral trivalent"
+65,"rabies vaccine, inactivated, embryonated egg based, purified duck embryo vaccine"
+66,"rabies vaccine, inactivated, cell culture, primary hampster kidney cell"
+67,"rabies vaccine, inactivated, cell culture, purified vero cell"
+68,"rabies vaccine, inactivated, cell culture, human diploid cell"
+69,"rabies vaccine, inactivated, cell culture, purified chick embryo cell"
+70,"rota vaccine, live attenuated, RV5"
+71,"rota vaccine, live attenuated, RV1"
+72,"rubella vaccine, live attenuated, RA 27/3 strain"
+73,"yellow fever vaccine, live attenuated, 17D-204 strain"
+74,"yellow fever vaccine, live attenuated, 17DD strain"
+75,"papilloma virus vaccine, L1 protein, HPV2"
+76,"papilloma virus vaccine, L1 protein, HPV4"
+77,"papilloma virus vaccine, L1 protein, HPV9"
+78,"diphtheria tetanus pertussis vaccine, diphtheria toxoid tetanus toxoid Acellular Pertussis, IPV, DTaP-IPV"
+79,"diphtheria tetanus pertussis vaccine, diphtheria toxoid tetanus toxoid Acellular Pertussis, IPV, HepB antigen, DTaP-IPV-HepB"
+80,"diphtheria tetanus pertussis vaccine, diphtheria toxoid tetanus toxoid Acellular Pertussis, IPV, Hib, DTaP-IPV-Hib"
+81,"diphtheria tetanus pertussis vaccine, diphtheria toxoid tetanus toxoid Acellular Pertussis, HiB, DTaP-Hib"
+82,"diphtheria tetanus pertussis vaccine, diphtheria toxoid tetanus toxoid Whole cell Pertussis, HiB, DTP-Hib"
+83,live_attenuated; cholera_vaccine
+84,diphtheria_vaccine
+85,toxoid
+86,haemophilus_influenzae_B_vaccine; polysaccharide_conjugate; PRP_T
+87,pure_polysaccharide; meningococcal_vaccine
+88,polysaccharide_conjugate; meningococcal_vaccine; bivalent
+89,tetanus_vaccine; diptheria_vaccine; pertusis_vaccine; diphtheria_toxoid; tetanus_toxoid; Acellular_Pertussis; DTaP_(pediatric_formulation)
+90,haemophilus_influenzae_B_vaccine; tetanus_vaccine; diptheria_vaccine; pertusis_vaccine; diphtheria_toxoid; tetanus_toxoid; Acellular_Pertussis; haemophilus_influenzae_B_polysaccharide_conjugate
+91,tetanus_vaccine; diptheria_vaccine; pertusis_vaccine; DTaP_Hib
+92,live_attenuated; tuberculosis_vaccine
+93,live_attenuated; typhoid_vaccine
+94,typhoid_vaccine; capsular_polysaccaride
+95,typhoid_vaccine; conjugate
+96,adult; hepatitis_B_vaccine; recombinant_surface_antigen
+97,live_attenuated; measles_vaccine; mumps_vaccine; rubella_vaccine
+98,live_attenuated; varicella_zoster_vaccine
+99,measles_vaccine; mumps_vaccine; rubella_vaccine; varicella_vaccine
+100,polio_vaccine; inactivated
+101,inactivated; rabies_vaccine; embryonated_egg_based
+102,tetanus_vaccine; diptheria_vaccine; pertusis_vaccine; Inactivated_poliovirus_vaccine; recombinant_surface_antigen_HepB_vaccine
+103,tetanus_vaccine; diptheria_vaccine; pertusis_vaccine; Inactivated_poliovirus_vaccine; haemophilus_influenzae_B
+104,anthrax_vaccine; cell_free_filtrate
+105,anthrax_vaccine; live_attenuated
+106,inactivated_whole_cell
+107,meningococcal_vaccine; recombinant_protein
+108,pertussis_vaccine
+109,pure_polysaccharide; pneumococcal_vaccine
+110,tetanus_vaccine; diptheria_vaccine; diptheria_and_tetanus_toxoid_vaccine
+111,haemophilus_influenzae_B_vaccine; tetanus_vaccine; diptheria_vaccine; pertusis_vaccine
+112,tuberculosis_vaccine
+113,covid_19_vaccine; mRNA
+114,covid_19_vaccine; viral_vector
+115,inactivated_whole_virus; hepatitis_A_vaccine
+116,adult
+117,live_attenuated; measles_vaccine
+118,live_attenuated; mumps_vaccine
+119,live_attenuated; rota_vaccine
+120,live_attenuated; yellow_fever_vaccine
+121,cholera_vaccine
+122,recombinant_protein
+123,polysaccharide_conjugate; meningococcal_vaccine; quadrivalent
+124,plague_vaccine
+125,inactivated_whole_virus
+126,measles_vaccine; mumps_vaccine; rubella_vaccine
+127,live_attenuated; rubella_vaccine
+128,live_attenuated; polio_vaccine
+129,rota_vaccine
+130,yellow_fever_vaccine
+131,papilloma_virus_vaccine; L1_protein
+132,tetanus_vaccine; diptheria_vaccine; pertusis_vaccine; diphtheria_toxoid; tetanus_toxoid; Acellular_Pertussis
+133,hepatitis_A_vaccine
+134,hepatitis_B_vaccine; recombinant_surface_antigen
+135,inactivated; rabies_vaccine; cell_culture
+136,papilloma_virus_vaccine
+137,pure_polysaccharide
+138,haemophilus_influenzae_B_vaccine; polysaccharide_conjugate
+139,polysaccharide_conjugate; pneumococcal_vaccine
+140,measles_vaccine
+141,mumps_vaccine
+142,varicella_zoster_vaccine
+143,tetanus_vaccine; diptheria_vaccine; pertusis_vaccine; Inactivated_poliovirus_vaccine
+144,tetanus_vaccine; diptheria_vaccine; pertusis_vaccine; haemophilus_influenzae_B
+145,anthrax_vaccine
+146,polysaccharide_conjugate; meningococcal_vaccine
+147,typhoid_vaccine
+148,hepatitis_B_vaccine
+149,rubella_vaccine
+150,polio_vaccine
+151,inactivated; rabies_vaccine
+152,rabies_vaccine
+153,pneumococcal_vaccine
+154,inactivated
+155,haemophilus_influenzae_B_vaccine
+156,covid_19_vaccine
+157,meningococcal_vaccine
+158,tetanus_vaccine; diptheria_vaccine; pertusis_vaccine
+159,polysaccharide_conjugate
+160,tetanus_vaccine; diptheria_vaccine
+161,tetanus_vaccine
+162,live_attenuated
+163,
