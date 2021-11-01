@@ -1,0 +1,9 @@
+id,concept_name
+0,d_anthrax; m_cell_free_filtrate; m_live_attenuated; f_absorbed; f_precipitated; f_STI_1; f_A16R
+1,anthrax vaccine; cell free filtrate; anthrax vaccine adsorbed (AVA)
+2,anthrax vaccine; cell free filtrate; anthrax vaccine precipitated (AVP)
+3,anthrax vaccine; live attenuated; Russian (STI-1 strain)
+4,anthrax vaccine; live attenuated; China (A16R strain)
+5,d_anthrax; m_cell_free_filtrate
+6,d_anthrax; m_live_attenuated
+7,d_anthrax
