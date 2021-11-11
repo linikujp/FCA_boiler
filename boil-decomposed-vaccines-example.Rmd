@@ -1,0 +1,106 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+df <- readxl::read_excel("Vaccine-decomp-examples.xlsx", sheet = 1)
+
+library(tidyverse)
+
+df_with_mapping <- df %>% 
+  group_by(disease, mechanism, formulation) %>% 
+  mutate(id = cur_group_id())
+
+df2 <- df_with_mapping %>% 
+  select(id, disease, mechanism, formulation) %>% 
+  distinct() %>% 
+  ungroup()
+  
+df2
+```
+```{r}
+mechanism_combos <- df2 %>% 
+  mutate(formulation = NA_character_) %>% 
+  select(-id)
+  
+df3 <- df2 %>% 
+  select(-formulation) 
+
+mechanism_single <- df3 %>% 
+  mutate(across(c(disease, mechanism), ~str_split(., "\\|"))) %>% 
+  unnest(cols = c(disease, mechanism)) %>% 
+  select(-id)
+
+
+
+disease_combo <- df2 %>% 
+  select(-id) %>% 
+  mutate(mechanism = NA_character_, formulation = NA_character_)
+
+disease_single <- disease_combo %>% 
+  mutate(across(c(disease), ~str_split(., "\\|"))) %>% 
+  unnest(cols = c(disease)) %>% 
+  mutate(mechanism = NA_character_, formulation = NA_character_)
+
+
+expanded <- bind_rows(select(df2, -id),
+          mechanism_single, 
+          mechanism_combos,
+          disease_combo,
+          disease_single) %>% 
+  distinct() %>% 
+  mutate(id = row_number()) %>% 
+  select(id, everything())
+
+```
+
+
+```{r}
+fc <- expanded %>% 
+  pivot_longer(cols = c(disease, mechanism, formulation)) %>% 
+  # select(id, value) %>% 
+  mutate(value = str_split(value, "\\|")) %>% 
+  unnest(cols = "value") %>% 
+  mutate(value = str_trim(value)) %>% 
+  mutate(value = str_replace_all(value, "\\s|-", "_")) %>% 
+  mutate(value = str_remove_all(value, "\\(|\\)|,")) %>% 
+  mutate(x = "X") %>% 
+  distinct() %>% 
+  filter(!is.na(value)) %>% 
+  mutate(value = paste0(toupper(str_sub(name, 1, 1)), "_", value)) %>% 
+  select(-name) %>% 
+  pivot_wider(names_from = "value", values_from = "x", values_fill = "")
+
+
+
+write_csv(fc, "formal_context2.csv")
+```
+
+
+```{r}
+library(reticulate)
+source_python("boiler.py")
+boiler(here::here("formal_context.csv"))
+```
+
+```{r}
+import("concept")
+```
+
+
+
+```{python}
+from concepts import Context
+c = Context.fromfile("formal_context.csv", frmat='csv')
+```
+
+```{python}
+c.lattice.graphviz()
+```
+

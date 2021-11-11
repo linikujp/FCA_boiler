@@ -1,0 +1,9 @@
+name,d_tetanus,d_diptheria,m_toxoid,f_adult,f_pediatric
+tetanus,X,,,,
+diptheria,,X,,,
+T&D,X,X,,,
+T toxoid,X,,X,,
+D toxoid,,X,X,,
+tetanus toxoid & diptheria toxoid,X,X,X,,
+Td (adult),X,X,X,X,
+Dt (pediatric),X,X,X,,X

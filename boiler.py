@@ -28,7 +28,7 @@ def boiler(csv_filename, output_path):
   
   maps_to_list = []
   for idx, con in enumerate(concept_list):
-      parent_concept_indexes = [concept_list.index(c) for c  in list(con.upper_neighbors)]
+      parent_concept_indexes = [concept_list.index(c) for c in list(con.upper_neighbors)]
       for parent_idx in parent_concept_indexes:
           maps_to_list.append((idx, parent_idx))
           

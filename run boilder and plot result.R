@@ -1,6 +1,5 @@
 library(reticulate)
 library(here)
-
 # py_install(c("concepts", "pandas"), pip = T)
 source_python("boiler.py")
 boiler(here::here("anthrax_formal_concept.csv"), here::here("anthrax_"))
@@ -20,6 +19,11 @@ edges <- readr::read_csv("anthrax_concept_relationship.csv") %>%
   filter(to > 0, from > 0)
 
 graph <- tbl_graph(nodes, edges, directed = T)
+
+# graph %>% 
+#   to_subgraph(subset_by)
+
+
 
 # plot using ggraph
 plt <- ggraph(graph, layout = 'kk') + 
@@ -55,7 +59,7 @@ graph <- tbl_graph(nodes, edges, directed = T)
   
   # geom_node_text(aes(label = name)) #+
 
-ggplotly(plt)
+# ggplotly(plt)
   
 library(networkD3)
 

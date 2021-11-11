@@ -1,0 +1,5 @@
+id,D _ tetanus,D _ diptheria,M _ tetanus_toxoid,M _ diptheria_toxoid,F _ DT_pediatric,D _ polio,M _ IPV,F _ DT_IPV_pediatric,F _ Td_adult
+2,X,X,X,X,X,,,,
+4,X,X,X,X,,X,X,X,
+3,X,X,X,X,,,,,X
+1,X,,X,,,,,,
