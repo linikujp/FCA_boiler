@@ -1,0 +1,169 @@
+---
+title: "Boil decomposed cvx codes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+df <- readr::read_csv("decomposition_cvx.csv")
+df2 <- df %>% 
+  select(vacc_id, matches("disease|mechanism")) %>% 
+  tidyr::gather("key", "value", -vacc_id) %>% 
+  tidyr::separate("key", into = c("key", "num"), sep = -1) %>% 
+  tidyr::spread("key", "value") %>% 
+  filter(!(is.na(disease) & is.na(mechanism))) %>% 
+  arrange(vacc_id, num)
+
+```
+
+
+
+```{r}
+mechanism_single <- df2 %>% 
+  filter(!is.na(mechanism)) %>% 
+  select(disease, mechanism) %>% 
+  distinct()
+  
+disease_single <- df2 %>% 
+  mutate(mechanism = NA_character_) %>% 
+  filter(!is.na(disease)) %>% 
+  select(disease, mechanism) %>% 
+  distinct()
+
+mechanism_combos <- df2 %>% 
+  filter(!is.na(mechanism)) %>% 
+  group_by(vacc_id) %>% 
+  summarise(disease = str_c(disease, collapse = "|"), mechanism = str_c(mechanism, collapse = "|"), n = n()) %>% 
+  ungroup() %>% 
+  filter(n > 1) %>% 
+  select(disease, mechanism) %>% 
+  distinct()
+
+disease_combos <- df2 %>% 
+  select(vacc_id, disease) %>% 
+  distinct() %>% 
+  group_by(vacc_id) %>% 
+  summarise(disease = str_c(disease, collapse = "|"), n = n()) %>% 
+  ungroup() %>% 
+  filter(n > 1) %>% 
+  mutate(mechanism = NA_character_) %>% 
+  select(disease, mechanism) %>% 
+  distinct()
+
+expanded <- bind_rows(select(df2, disease, mechanism),
+          mechanism_single, 
+          mechanism_combos,
+          disease_single,
+          disease_combos) %>% 
+  distinct() %>% 
+  arrange(disease, mechanism) %>% 
+  mutate(id = row_number()) %>% 
+  select(id, everything())
+
+```
+
+
+```{r}
+fc <- expanded %>% 
+  pivot_longer(cols = c(disease, mechanism)) %>% 
+  # select(id, value) %>% 
+  mutate(value = str_split(value, "\\|")) %>% 
+  unnest(cols = "value") %>% 
+  mutate(value = str_trim(value)) %>% 
+  mutate(value = str_replace_all(value, "\\s|-", "_")) %>% 
+  mutate(value = str_remove_all(value, "\\(|\\)|,")) %>% 
+  mutate(x = "X") %>% 
+  distinct() %>% 
+  filter(!is.na(value)) %>% 
+  mutate(value = paste0(toupper(str_sub(name, 1, 1)), "_", value)) %>% 
+  select(-name) %>% 
+  pivot_wider(names_from = "value", values_from = "x", values_fill = "")
+
+write_csv(fc, "cvx_formal_context.csv")
+```
+
+
+
+
+```{r}
+library(reticulate)
+source_python("boiler.py")
+
+boiler(here::here("cvx_experiment/cvx_formal_context.csv"), here::here("cvx_experiment/cvx_"))
+```
+
+
+```{r}
+concept <- read_csv("cvx_concept.csv")
+cr <- read_csv("cvx_concept_relationship.csv")
+
+concept
+```
+
+```{r}
+library(tidygraph)
+
+assertthat::are_equal(concept$id, 0:(nrow(concept)-1))
+
+nodes <- concept %>% 
+  mutate(id = id + 1) %>% 
+  mutate(name = ifelse(id == 1, "Vaccine", concept_name)) %>% 
+  filter(!is.na(name)) %>% 
+  select(name) %>% 
+  mutate(display_name = ifelse(str_detect(name, "M_"), str_remove_all(name, "D_\\w+;"), name))
+
+edges <- cr %>% 
+  mutate(from = id_2+1, to = id_1+1) %>% 
+  select(from, to) %>% 
+  # remove edges from the terminal node
+  filter(from < nrow(nodes), to < nrow(nodes))
+
+g <- tbl_graph(nodes, edges)
+
+plot(g)
+
+library(ggraph)
+set.seed(1)
+
+ggraph(g, 'fr') + 
+    geom_node_point() +
+    geom_edge_link() + 
+    coord_fixed()
+
+```
+
+
+
+```{r}
+plt <- g %>% 
+  activate(nodes) %>% 
+  filter(str_detect(name, "D_tetanus")) %>% 
+  ggraph('fr') + 
+  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
+  geom_node_point() + 
+  coord_fixed() +
+  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
+
+ggsave("tetanus.png", plt, width = 30, height = 30)
+```
+
+
+
+```{r}
+plt <- g %>% 
+  activate(nodes) %>% 
+  filter(str_detect(name, "D_measles")) %>% 
+  ggraph('fr') + 
+  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
+  geom_node_point() + 
+  coord_fixed() +
+  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
+
+ggsave("measles.png", plt, width = 10, height = 10)
+```
+

@@ -1,0 +1,92 @@
+id,concept_name
+0,D_adenovirus; M_adenovirus_live; D_anthrax; D_cholera; D_covid_19; M_covid_19_mRNA; M_covid_19_vector; D_dengue; D_diphtheria; M_diphtheria_antitoxin; M_diphtheria_toxoid; D_tetanus; M_tetanus_toxoid; D_pertussis; M_acellular_pertussis; D_haemophilus_influenza; D_hepatitis_b; M_hepatitis_b_recombinant; M_haemophilus_influenza_conjugate; D_poliovirus; M_poliovirus_inactivated; D_hepatitis_a; M_hepatitis_a_live; D_hepatitis_c; D_hepatitis_e; D_human_papilomavirus; D_influenza; M_influenza_live; M_influenza_recomb; D_japanese_encephalitis; D_measles; D_rubella; D_mumps; D_varicella; D_meningococcal; M_meningococcal_conjugate; M_meningococcal_oligosaccharide; M_meningococcal_polysaccharide; M_meningococcal_recombinant; M_whole_cell_pertussis; D_plague; D_pneumococcal; M_pneumococcal_conjugate; M_pneumococcal_polysaccharide; M_poliovirus_live; D_rabies; D_rotavirus; M_rotavirus_live; D_smallpox; D_typhoid; M_typhoid_acetone_killed; M_typhoid_conjugate; M_typhoid_live; M_typhoid_polysaccharide; M_varicella_live; M_varicella_recombinant; D_Venezuelan_equine_encephalitis; M_Venezuelan_equine_encephalitis_inactivated; M_Venezuelan_equine_encephalitis_live; D_yellow_fever
+1,D_adenovirus; M_adenovirus_live
+2,D_anthrax
+3,D_cholera
+4,D_covid_19; M_covid_19_mRNA
+5,D_covid_19; M_covid_19_vector
+6,D_dengue
+7,D_diphtheria; M_diphtheria_antitoxin
+8,D_diphtheria; M_diphtheria_toxoid; D_tetanus; M_tetanus_toxoid; D_pertussis; M_acellular_pertussis; D_haemophilus_influenza; D_hepatitis_b; M_hepatitis_b_recombinant; M_haemophilus_influenza_conjugate; D_poliovirus; M_poliovirus_inactivated
+9,D_hepatitis_a; M_hepatitis_a_live
+10,D_hepatitis_b; D_hepatitis_a
+11,D_hepatitis_c
+12,D_hepatitis_e
+13,D_human_papilomavirus
+14,D_influenza; M_influenza_live
+15,D_influenza; M_influenza_recomb
+16,D_japanese_encephalitis
+17,D_measles; D_rubella; D_mumps; D_varicella
+18,D_meningococcal; M_meningococcal_oligosaccharide
+19,D_meningococcal; M_meningococcal_polysaccharide
+20,D_meningococcal; M_meningococcal_recombinant
+21,D_haemophilus_influenza; M_haemophilus_influenza_conjugate; D_meningococcal; M_meningococcal_conjugate
+22,D_pertussis; D_haemophilus_influenza; M_haemophilus_influenza_conjugate; M_whole_cell_pertussis
+23,D_plague
+24,D_pneumococcal; M_pneumococcal_conjugate
+25,D_pneumococcal; M_pneumococcal_polysaccharide
+26,D_poliovirus; M_poliovirus_live
+27,D_rabies
+28,D_rotavirus; M_rotavirus_live
+29,D_smallpox
+30,D_typhoid; M_typhoid_acetone_killed
+31,D_typhoid; M_typhoid_conjugate
+32,D_typhoid; M_typhoid_live
+33,D_typhoid; M_typhoid_polysaccharide
+34,D_varicella; M_varicella_live
+35,D_varicella; M_varicella_recombinant
+36,D_Venezuelan_equine_encephalitis; M_Venezuelan_equine_encephalitis_inactivated
+37,D_Venezuelan_equine_encephalitis; M_Venezuelan_equine_encephalitis_live
+38,D_yellow_fever
+39,D_adenovirus
+40,D_diphtheria; M_diphtheria_toxoid; D_tetanus; M_tetanus_toxoid; D_pertussis; M_acellular_pertussis; D_haemophilus_influenza; D_hepatitis_b; M_hepatitis_b_recombinant; M_haemophilus_influenza_conjugate
+41,D_diphtheria; M_diphtheria_toxoid; D_tetanus; M_tetanus_toxoid; D_pertussis; M_acellular_pertussis; D_haemophilus_influenza; M_haemophilus_influenza_conjugate; D_poliovirus; M_poliovirus_inactivated
+42,D_diphtheria; D_tetanus; D_pertussis; D_haemophilus_influenza; D_hepatitis_b; D_poliovirus
+43,D_measles; D_rubella; D_mumps
+44,D_meningococcal; M_meningococcal_conjugate
+45,D_haemophilus_influenza; D_meningococcal
+46,D_pertussis; M_whole_cell_pertussis
+47,D_rotavirus
+48,D_covid_19
+49,D_diphtheria; M_diphtheria_toxoid; D_tetanus; M_tetanus_toxoid; D_pertussis; M_acellular_pertussis; D_haemophilus_influenza; M_haemophilus_influenza_conjugate
+50,D_hepatitis_b; M_hepatitis_b_recombinant
+51,D_diphtheria; M_diphtheria_toxoid; D_tetanus; M_tetanus_toxoid; D_pertussis; M_acellular_pertussis; D_poliovirus; M_poliovirus_inactivated
+52,D_diphtheria; D_tetanus; D_pertussis; D_hepatitis_b; D_poliovirus
+53,D_hepatitis_a
+54,D_influenza
+55,D_measles; D_rubella
+56,D_rubella; D_mumps
+57,D_pneumococcal
+58,D_Venezuelan_equine_encephalitis
+59,D_diphtheria; D_tetanus; D_pertussis; D_haemophilus_influenza; D_hepatitis_b
+60,D_pertussis; M_acellular_pertussis; D_haemophilus_influenza; M_haemophilus_influenza_conjugate
+61,D_poliovirus; M_poliovirus_inactivated
+62,D_diphtheria; D_tetanus; D_pertussis; D_haemophilus_influenza; D_poliovirus
+63,D_measles
+64,D_mumps
+65,D_varicella
+66,D_diphtheria; M_diphtheria_toxoid; D_tetanus; M_tetanus_toxoid; D_pertussis; M_acellular_pertussis
+67,D_diphtheria; D_tetanus; D_pertussis; D_hepatitis_b
+68,D_haemophilus_influenza; D_hepatitis_b
+69,D_pertussis; D_haemophilus_influenza; M_haemophilus_influenza_conjugate
+70,D_rubella
+71,D_typhoid
+72,D_diphtheria; M_diphtheria_toxoid; D_tetanus; M_tetanus_toxoid
+73,D_diphtheria; M_diphtheria_toxoid
+74,D_tetanus; M_tetanus_toxoid
+75,D_pertussis; M_acellular_pertussis
+76,D_diphtheria; D_tetanus; D_pertussis; D_haemophilus_influenza
+77,D_haemophilus_influenza; M_haemophilus_influenza_conjugate
+78,D_diphtheria; D_tetanus; D_pertussis; D_poliovirus
+79,D_meningococcal
+80,D_diphtheria; D_tetanus; D_poliovirus
+81,D_pertussis; D_haemophilus_influenza
+82,D_hepatitis_b
+83,D_poliovirus
+84,D_diphtheria; D_tetanus; D_pertussis
+85,D_haemophilus_influenza
+86,D_diphtheria; D_tetanus
+87,D_tetanus
+88,D_pertussis
+89,D_diphtheria
+90,
