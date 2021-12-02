@@ -1,0 +1,252 @@
+---
+title: "Boil Decomposed Vaccine Codes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library(tidyverse)
+df <- readr::read_tsv("decomposition_proc.tsv")
+df2 <- df %>% 
+  select(vacc_id, matches("^p|^m")) %>% 
+  tidyr::gather("key", "value", -vacc_id) %>% 
+  tidyr::separate("key", into = c("key", "num"), sep = -1) %>% 
+  tidyr::spread("key", "value") %>% 
+  rename(disease = p, mechanism = m) %>% 
+  filter(!(is.na(disease) & is.na(mechanism))) %>% 
+  # remove concepts without a disease
+  filter(!is.na(disease)) %>% 
+  arrange(vacc_id, num)
+
+df2 <- df2 %>% 
+  filter(disease == "adenovirus")
+
+df2 <- df2 %>% 
+  mutate(mechanism = NA_character_)
+
+```
+
+
+
+```{r}
+# single mechanism concepts
+mechanism_single <- df2 %>% 
+  filter(!is.na(mechanism)) %>% 
+  select(disease, mechanism) %>% 
+  distinct()
+  
+# single disease concepts
+disease_single <- df2 %>% 
+  mutate(mechanism = NA_character_) %>% 
+  filter(!is.na(disease)) %>% 
+  select(disease, mechanism) %>% 
+  distinct()
+
+# combination mechanism concepts
+mechanism_combos <- df2 %>% 
+  filter(!is.na(mechanism)) %>% 
+  group_by(vacc_id) %>% 
+  summarise(disease = str_c(disease, collapse = "|"), mechanism = str_c(mechanism, collapse = "|"), n = n()) %>% 
+  ungroup() %>% 
+  filter(n > 1) %>% 
+  select(disease, mechanism) %>% 
+  distinct()
+
+# combination disease concepts
+disease_combos <- df2 %>% 
+  select(vacc_id, disease) %>% 
+  distinct() %>% 
+  group_by(vacc_id) %>% 
+  summarise(disease = str_c(disease, collapse = "|"), n = n()) %>% 
+  ungroup() %>% 
+  filter(n > 1) %>% 
+  mutate(mechanism = NA_character_) %>% 
+  select(disease, mechanism) %>% 
+  distinct()
+
+# combine all expanded concepts into a single dataframe
+expanded <- bind_rows(select(df2, disease, mechanism),
+          mechanism_single, 
+          mechanism_combos,
+          disease_single,
+          disease_combos) %>% 
+  distinct() %>% 
+  arrange(disease, mechanism) %>% 
+  mutate(id = row_number()) %>% 
+  select(id, everything())
+
+```
+
+
+```{r}
+
+# reformat the concepts into a formal context
+fc <- expanded %>% 
+  pivot_longer(cols = c(disease, mechanism)) %>% 
+  # select(id, value) %>% 
+  mutate(value = str_split(value, "\\|")) %>% 
+  unnest(cols = "value") %>% 
+  mutate(value = str_trim(value)) %>% 
+  mutate(value = str_replace_all(value, "\\s|-", "_")) %>% 
+  mutate(value = str_remove_all(value, "\\(|\\)|,")) %>% 
+  mutate(x = "X") %>% 
+  distinct() %>% 
+  filter(!is.na(value)) %>% 
+  mutate(value = paste0(toupper(str_sub(name, 1, 1)), "_", value)) %>% 
+  select(-name) %>% 
+  pivot_wider(names_from = "value", values_from = "x", values_fill = "")
+
+write_csv(fc, "formal_context.csv")
+
+```
+
+```{python}
+def boiler(csv_filename, output_path):
+  
+  from concepts import Context
+  import pandas as pd
+  import os
+  
+  print("Using working directory: " + os.getcwd())
+  output_path = os.getcwd() + "/" + output_path
+  
+  # create the context object from the csv file
+  c = Context.fromfile(os.getcwd() + "/" + csv_filename, frmat='csv')
+  
+  # use the attributes (intent) to define the concept name
+  def get_concept_name(concept):
+    nm = "; ".join(list(concept.intent))
+    return nm
+    
+  concept_list = [a for a in c.lattice]
+  concept_names = [get_concept_name(a) for a in concept_list]
+  
+  maps_to_list = []
+  for idx, con in enumerate(concept_list):
+      parent_concept_indexes = [concept_list.index(c) for c in list(con.upper_neighbors)]
+      for parent_idx in parent_concept_indexes:
+          maps_to_list.append((idx, parent_idx))
+          
+  # create the concept table. Make sure concept ids start with 0 which need to be fixed.
+  concept_df = pd.DataFrame({"id" : range(len(concept_names)), "concept_name" : concept_names})
+  
+  # create the 'Is a' relationship table. Add 1 to concept ids so they start with 1 instead of 0.
+  concept_relationship_df = pd.DataFrame({"id_1" : [x for x, _ in maps_to_list], 
+                                          "relationship" : "Is a", 
+                                          "id_2" : [x for _ , x in maps_to_list]})
+                                          
+  
+  concept_df.to_csv(output_path + "concept.csv", index = False)
+  concept_relationship_df.to_csv(output_path + "concept_relationship.csv", index = False)
+
+# Run the boiler function using the formal context as input
+boiler('formal_context.csv', 'new_vaccine_vocab_')
+```
+
+
+```{r}
+concept <- read_csv("new_vaccine_vocab_concept.csv") %>% 
+  filter(!is.na(concept_name)) #%>%
+  # mutate(concept_name = ifelse(id == 0, "Vaccine", concept_name))
+
+cr <- read_csv("new_vaccine_vocab_concept_relationship.csv") %>% 
+  filter(id_1 %in% concept$id, id_2 %in% concept$id)
+
+concept
+```
+
+```{r}
+
+cr %>% 
+  left_join(rename(concept, concept_name_1 = concept_name), by = c("id_1" = "id")) %>% 
+  left_join(rename(concept, concept_name_2 = concept_name), by = c("id_2" = "id")) %>% 
+  select(concept_name_1, concept_name_2)
+  
+```
+
+## Visualize Boiler Output
+
+```{r}
+library(tidygraph)
+
+# assertthat::are_equal(concept$id, 1:nrow(concept))
+
+# create graph data structure
+nodes <- concept %>% 
+  mutate(id = id + 1) %>%
+  mutate(name = ifelse(id == 1, "Vaccine", concept_name)) %>%
+  mutate(name = concept_name) %>% 
+  filter(!is.na(name)) %>%
+  select(name) %>% 
+  mutate(display_name = ifelse(str_detect(name, "M_"), str_remove_all(name, "D_\\w+;"), name))
+
+edges <- cr %>% 
+  mutate(from = id_2+1, to = id_1+1) %>% 
+  select(from, to) %>% 
+  # remove edges from the terminal node
+  filter(from < nrow(nodes), to < nrow(nodes))
+
+g <- tbl_graph(nodes, edges)
+
+# plot(g)
+
+library(ggraph)
+set.seed(1)
+
+ggraph(g, 'fr') + 
+    geom_node_point() +
+    geom_edge_link() + 
+    coord_fixed()
+
+```
+
+```{r}
+
+plt <- g %>% 
+  # activate(nodes) %>% 
+  # filter(str_detect(name, "D_tetanus")) %>% 
+  ggraph('fr') + 
+  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
+  geom_node_point() + 
+  coord_fixed() +
+  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
+
+# plt
+ggsave("vaccines.png", plt, width = 30, height = 30)
+
+```
+
+
+```{r}
+plt <- g %>% 
+  activate(nodes) %>% 
+  filter(str_detect(name, "D_tetanus")) %>% 
+  ggraph('fr') + 
+  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
+  geom_node_point() + 
+  coord_fixed() +
+  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
+
+ggsave("tetanus.png", plt, width = 30, height = 30)
+```
+
+
+
+```{r}
+plt <- g %>% 
+  activate(nodes) %>% 
+  filter(str_detect(name, "D_measles")) %>% 
+  ggraph('fr') + 
+  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
+  geom_node_point() + 
+  coord_fixed() +
+  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
+
+ggsave("measles.png", plt, width = 10, height = 10)
+```
+
