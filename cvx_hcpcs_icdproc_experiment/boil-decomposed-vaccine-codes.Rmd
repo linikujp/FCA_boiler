@@ -23,11 +23,11 @@ df2 <- df %>%
   filter(!is.na(disease)) %>% 
   arrange(vacc_id, num)
 
-df2 <- df2 %>% 
-  filter(disease == "adenovirus")
+# df2 <- df2 %>% 
+  # filter(disease %in% c("covid-19", "adenovirus"))
 
-df2 <- df2 %>% 
-  mutate(mechanism = NA_character_)
+# df2 <- df2 %>% 
+  # mutate(mechanism = NA_character_)
 
 ```
 
@@ -126,6 +126,7 @@ def boiler(csv_filename, output_path):
   concept_list = [a for a in c.lattice]
   concept_names = [get_concept_name(a) for a in concept_list]
   
+  print(len(concept_list))
   maps_to_list = []
   for idx, con in enumerate(concept_list):
       parent_concept_indexes = [concept_list.index(c) for c in list(con.upper_neighbors)]
@@ -151,8 +152,10 @@ boiler('formal_context.csv', 'new_vaccine_vocab_')
 
 ```{r}
 concept <- read_csv("new_vaccine_vocab_concept.csv") %>% 
-  filter(!is.na(concept_name)) #%>%
+  mutate(concept_name = ifelse(is.na(concept_name), "Vaccine", concept_name)) %>% 
+  # filter(!is.na(concept_name)) #%>%
   # mutate(concept_name = ifelse(id == 0, "Vaccine", concept_name))
+  {.}
 
 cr <- read_csv("new_vaccine_vocab_concept_relationship.csv") %>% 
   filter(id_1 %in% concept$id, id_2 %in% concept$id)
@@ -165,31 +168,33 @@ concept
 cr %>% 
   left_join(rename(concept, concept_name_1 = concept_name), by = c("id_1" = "id")) %>% 
   left_join(rename(concept, concept_name_2 = concept_name), by = c("id_2" = "id")) %>% 
-  select(concept_name_1, concept_name_2)
+  select(concept_name_1, relationship,  concept_name_2)
   
 ```
 
 ## Visualize Boiler Output
 
 ```{r}
+
 library(tidygraph)
 
 # assertthat::are_equal(concept$id, 1:nrow(concept))
 
 # create graph data structure
 nodes <- concept %>% 
-  mutate(id = id + 1) %>%
-  mutate(name = ifelse(id == 1, "Vaccine", concept_name)) %>%
+  filter(id != 0) %>%  # The terminal node of the graph
+  # mutate(id = id + 1) %>%
+  # mutate(name = ifelse(id == 1, "Vaccine", concept_name)) %>%
   mutate(name = concept_name) %>% 
-  filter(!is.na(name)) %>%
+  # filter(!is.na(name)) %>%
   select(name) %>% 
   mutate(display_name = ifelse(str_detect(name, "M_"), str_remove_all(name, "D_\\w+;"), name))
 
 edges <- cr %>% 
-  mutate(from = id_2+1, to = id_1+1) %>% 
+  mutate(from = id_2, to = id_1) %>% 
   select(from, to) %>% 
   # remove edges from the terminal node
-  filter(from < nrow(nodes), to < nrow(nodes))
+  filter(from > 0, to > 0)
 
 g <- tbl_graph(nodes, edges)
 
@@ -222,6 +227,9 @@ ggsave("vaccines.png", plt, width = 30, height = 30)
 ```
 
 
+
+
+
 ```{r}
 plt <- g %>% 
   activate(nodes) %>% 
@@ -237,6 +245,7 @@ ggsave("tetanus.png", plt, width = 30, height = 30)
 
 
 
+
 ```{r}
 plt <- g %>% 
   activate(nodes) %>% 
@@ -248,5 +257,75 @@ plt <- g %>%
   ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
 
 ggsave("measles.png", plt, width = 10, height = 10)
+```
+
+
+
+```{r}
+
+library(plotly)
+library(igraph)
+library(igraphdata)
+
+data(karate, package="igraphdata")
+# G <- upgrade_graph(karate)
+G <- g
+# L <- layout.circle(G)
+L <- layout.auto(G)
+
+nm <- g %>% 
+  activate(nodes) %>% 
+  pull(display_name)
+
+# Create Vertices and Edges
+vs <- V(G)
+es <- as.data.frame(get.edgelist(G))
+
+Nv <- length(vs)
+Ne <- length(es[1]$V1)
+  
+# Create Nodes
+library(plotly)
+
+Xn <- L[,1]
+Yn <- L[,2]
+
+names(Xn) <- g %>% activate(nodes) %>% pull(name)
+names(Yn) <- g %>% activate(nodes) %>% pull(name)
+
+# network <- plot_ly(x = ~Xn, y = ~Yn, mode = "markers", text = vs$label, hoverinfo = "text")
+network <- plot_ly(x = ~Xn, y = ~Yn, mode = "markers", text = nm, hoverinfo = "text")
+  
+# Creates Edges
+i=1
+edge_shapes <- list()
+for(i in 1:Ne) {
+  v0 <- es[i,]$V1
+  v1 <- es[i,]$V2
+
+  edge_shape = list(
+    type = "line",
+    line = list(color = "#030303", width = 0.3),
+    x0 = Xn[v0],
+    y0 = Yn[v0],
+    x1 = Xn[v1],
+    y1 = Yn[v1]
+  )
+
+  edge_shapes[[i]] <- edge_shape
+}
+  
+# Create Network
+axis <- list(title = "", showgrid = FALSE, showticklabels = FALSE, zeroline = FALSE)
+
+fig <- layout(
+  network,
+  title = 'FCA Boiler Vaccine Graph',
+  shapes = edge_shapes,
+  xaxis = axis,
+  yaxis = axis
+)
+
+fig
 ```
 
