@@ -1,17 +1,34 @@
 ---
-title: "Boil Decomposed Vaccine Codes"
+title: "Automated Ontology Construction using Formal Concept Analysis"
+author: Adam Black (adam.black@odysseusinc.com)
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 ```
 
+This document describes and implements the process of automatically building a hierarchy from a set of source codes and their decomposed attributes. We apply this approach to vaccines but the same algorithm could be applied to any data domain. Our goal is to build an ontology for vaccine concepts in an automated way. Concepts are the meaningful units of information in the source data and should be arranged into a hierarchy. In this ontology we are only concerned with hierarchical relationships (i.e. "Is a" relationships). If new source codes are identified it should be a simple process to re-run the hierarchy building algorithm to get a new ontology that includes any new concepts needed to represent the new source data.
 
-```{r}
+# Input description
 
+We start with a file containing "decomposed" source codes. The process of decomposition can be done manually or automatically, but in either case we need a table with one row for each source code and one column for each attribute. An "attribute" is defined as a meaningful quality of the concept represented by the source code. In some cases source codes will imply information that is not meaningful or useful for the intended use of the ontology we are trying to build. Information that is not useful for the final ontology should be removed and not encoded as an attribute.
+
+For vaccines we have at least two important attributes that are necessary to support vaccine research use cases using observational health data: **Disease** and **Mechanism**. Disease is the highest level attribute and is simply the disease that a vaccine is intended to protect against. Note that this does not include adjuvants (additional antigens used solely to enhance the immune response). Mechanism is the biological description of how the vaccine accomplishes it's immune response (TODO - need some help clarifying mechanism from the biology folks). Vaccines are often given in combinations where a single vaccine will have multiple disease attributes. We refer to these vaccines as multi-component vaccines and each disease defining a single component. We assume that each disease component has either 0 or 1 associated mechanism attribute.
+
+We define a hierarchy between the attributes based on dependency between the attributes. A vaccine component must have a disease attribute and may or may not have a mechanism attribute. It cannot have a mechanism without a disease. Thus we say that Mechanism depends on disease and our attribute hierarchy has two levels: Disease \> Mechanism.
+
+Our input file is in a wide format with one row per vaccine source code and up to 5 disease columns and up to 5 mechanism columns. We need to perform some validation to make sure that each mechanism attribute is accompanied by a disease attribute.
+
+```{r, message=FALSE}
 library(tidyverse)
 df <- readr::read_tsv("decomposition_proc.tsv")
+df
+```
+
+The disease attribute columns in this input table are prefixed with a "p" and the mechanism columns are prefixed with an "m". First we transpose the data into a long format with one row per vaccine component and remove any components that do not have a disease.
+
+```{r}
 df2 <- df %>% 
   select(vacc_id, matches("^p|^m")) %>% 
   tidyr::gather("key", "value", -vacc_id) %>% 
@@ -23,15 +40,22 @@ df2 <- df %>%
   filter(!is.na(disease)) %>% 
   arrange(vacc_id, num)
 
+# This is where the pipeline could be subset to specific vaccines 
+# or subset to only disease attributes for development, testing, or debugging
 # df2 <- df2 %>% 
   # filter(disease %in% c("covid-19", "adenovirus"))
 
 # df2 <- df2 %>% 
   # mutate(mechanism = NA_character_)
 
+df2
 ```
 
+Next we need to extract all possible combinations of attributes and make sure that all parent concepts get created. The model for hierarchy we are using comes from work done by Yupeng Li and defines specific combination disease and mechanism level concepts in the hierarchy. For example... TODO (add example to explain how combination disease and mechanism concepts are handled).
 
+This process should be "lazy" meaning that we do not create every possible combination of diseases or mechanism. Instead we only create combinations that are targets or parents of a vaccine source code.
+
+We approach this by first creating single disease and single mechanism concepts. Single disease concepts have no mechanism. Single mechanism concepts must have both disease and mechanism attributes. Next we create combination mechanism concepts. We use the "\|" character to delimit multiple mechanisms and each mechanism has an associated disease so the disease attribute also is a combination with the "\|" character as a separator. Since disease \> mechanism, disease can occur alone but mechanism cannot. Finally we put all possible combinations of attributes into a single dataframe and create a new id. These are the concepts in our new ontology. (A concept is just a unique combination of attributes.) In the next step we need to create the hierarchical relationships between them.
 
 ```{r}
 # single mechanism concepts
@@ -80,8 +104,12 @@ expanded <- bind_rows(select(df2, disease, mechanism),
   mutate(id = row_number()) %>% 
   select(id, everything())
 
+expanded
 ```
 
+# Formal Concept Analysis (FCA)
+
+To create the hierarchical relationships between our concepts we will use a well known algorithm in information science called [formal concept analysis](https://en.wikipedia.org/wiki/Formal_concept_analysis "Wikipedia page on FCA"). We first need to reformat the input into a "formal context" which is a fancy term for a wide format table with one row per concept and one column per attribute. Each cell of the is filled with an "X" if the concept/item/row has the attribute defined in the column. Every attribute gets its own column. We do some data manipulation and a transpose operation to get the input data into the correct format for FCA and then save the output as a csv file.
 
 ```{r}
 
@@ -104,6 +132,8 @@ fc <- expanded %>%
 write_csv(fc, "formal_context.csv")
 
 ```
+
+While there is at least one FCA implementation in R, I found is easier to extract the hierarchical relationships using the implementation in the python package *concepts*. The next code chunk reads the input csv file, runs the FCA algorithm, creates concept and concept_relationship tables, and saves them as csv files.
 
 ```{python}
 def boiler(csv_filename, output_path):
@@ -149,46 +179,57 @@ def boiler(csv_filename, output_path):
 boiler('formal_context.csv', 'new_vaccine_vocab_')
 ```
 
+Next we read the csv file back into R. The lattice generated by FCA will always have a top node that includes all attributes, the "Vaccine" concept in our example", and a bottom node that includes all concepts and no attributes. The bottom node can be discarded. For concept names we simply use the list of attributes represented by the concept separated by semicolons. When displaying in a plot we remove the disease attributes on mechanism level concepts for readability.
 
 ```{r}
+# remove the bottom node
 concept <- read_csv("new_vaccine_vocab_concept.csv") %>% 
   mutate(concept_name = ifelse(is.na(concept_name), "Vaccine", concept_name)) %>% 
   # filter(!is.na(concept_name)) #%>%
   # mutate(concept_name = ifelse(id == 0, "Vaccine", concept_name))
   {.}
 
+# only include relationships between concepts in the concept table
 cr <- read_csv("new_vaccine_vocab_concept_relationship.csv") %>% 
   filter(id_1 %in% concept$id, id_2 %in% concept$id)
 
+# View the concept table
 concept
 ```
 
 ```{r}
-
+# Inspect the concept relationship table
 cr %>% 
+  filter(id_1 > 0) %>% # remove terminal/bottom node
   left_join(rename(concept, concept_name_1 = concept_name), by = c("id_1" = "id")) %>% 
   left_join(rename(concept, concept_name_2 = concept_name), by = c("id_2" = "id")) %>% 
   select(concept_name_1, relationship,  concept_name_2)
   
 ```
 
-## Visualize Boiler Output
+# Visualize Output
+
+It is helpful to visualize the graph created by the hierarchy building process.
 
 ```{r}
-
+# TODO: simplify this code
 library(tidygraph)
+library(plotly)
+library(igraph)
+library(igraphdata)
 
 # assertthat::are_equal(concept$id, 1:nrow(concept))
 
 # create graph data structure
 nodes <- concept %>% 
-  filter(id != 0) %>%  # The terminal node of the graph
-  # mutate(id = id + 1) %>%
-  # mutate(name = ifelse(id == 1, "Vaccine", concept_name)) %>%
+  filter(id != 0) %>%  # remove the terminal node of the graph
   mutate(name = concept_name) %>% 
-  # filter(!is.na(name)) %>%
   select(name) %>% 
-  mutate(display_name = ifelse(str_detect(name, "M_"), str_remove_all(name, "D_\\w+;"), name))
+  mutate(display_name = ifelse(str_detect(name, "M_"), str_remove_all(name, "D_\\w+;"), name)) %>% 
+  mutate(display_name = str_trim(display_name)) %>% 
+  mutate(node_type = ifelse(str_detect(name, "M_"), "mechanism", "disease")) %>% 
+  mutate(color = ifelse(node_type == "mechanism", "#eb3434", "#34b4eb")) # mechanisms are red, diseases are blue.
+
 
 edges <- cr %>% 
   mutate(from = id_2, to = id_1) %>% 
@@ -196,86 +237,18 @@ edges <- cr %>%
   # remove edges from the terminal node
   filter(from > 0, to > 0)
 
-g <- tbl_graph(nodes, edges)
-
-# plot(g)
-
-library(ggraph)
-set.seed(1)
-
-ggraph(g, 'fr') + 
-    geom_node_point() +
-    geom_edge_link() + 
-    coord_fixed()
-
-```
-
-```{r}
-
-plt <- g %>% 
-  # activate(nodes) %>% 
-  # filter(str_detect(name, "D_tetanus")) %>% 
-  ggraph('fr') + 
-  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
-  geom_node_point() + 
-  coord_fixed() +
-  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
-
-# plt
-ggsave("vaccines.png", plt, width = 30, height = 30)
-
-```
-
-
-
-
-
-```{r}
-plt <- g %>% 
-  activate(nodes) %>% 
-  filter(str_detect(name, "D_tetanus")) %>% 
-  ggraph('fr') + 
-  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
-  geom_node_point() + 
-  coord_fixed() +
-  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
-
-ggsave("tetanus.png", plt, width = 30, height = 30)
-```
-
-
-
-
-```{r}
-plt <- g %>% 
-  activate(nodes) %>% 
-  filter(str_detect(name, "D_measles")) %>% 
-  ggraph('fr') + 
-  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
-  geom_node_point() + 
-  coord_fixed() +
-  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
-
-ggsave("measles.png", plt, width = 10, height = 10)
-```
-
-
-
-```{r}
-
-library(plotly)
-library(igraph)
-library(igraphdata)
-
-data(karate, package="igraphdata")
-# G <- upgrade_graph(karate)
-G <- g
-# L <- layout.circle(G)
+G <- tbl_graph(nodes, edges)
 L <- layout.auto(G)
 
-nm <- g %>% 
+nm <- G %>% 
   activate(nodes) %>% 
   pull(display_name)
+
+# Blue #34b4eb = disease level concepts
+# Red #eb3434 = mechanism level concepts
+# TODO add different colors for combination disease and combo mechanism (possibly)
+# colors <- rep(c("#34b4eb", "#34eb5f"), each = ceiling(length(Xn)/2))[1:length(Xn)] # test
+colors <- G %>% activate(nodes) %>% pull(color)
 
 # Create Vertices and Edges
 vs <- V(G)
@@ -285,19 +258,18 @@ Nv <- length(vs)
 Ne <- length(es[1]$V1)
   
 # Create Nodes
-library(plotly)
-
 Xn <- L[,1]
 Yn <- L[,2]
 
-names(Xn) <- g %>% activate(nodes) %>% pull(name)
-names(Yn) <- g %>% activate(nodes) %>% pull(name)
+
+names(Xn) <- G %>% activate(nodes) %>% pull(name)
+names(Yn) <- G %>% activate(nodes) %>% pull(name)
 
 # network <- plot_ly(x = ~Xn, y = ~Yn, mode = "markers", text = vs$label, hoverinfo = "text")
-network <- plot_ly(x = ~Xn, y = ~Yn, mode = "markers", text = nm, hoverinfo = "text")
+network <- plot_ly(x = ~Xn, y = ~Yn, mode = "markers", text = nm, hoverinfo = "text",
+                   marker = list(color = colors))
   
 # Creates Edges
-i=1
 edge_shapes <- list()
 for(i in 1:Ne) {
   v0 <- es[i,]$V1
@@ -326,6 +298,69 @@ fig <- layout(
   yaxis = axis
 )
 
+# plotly::add_annotations(fig, "",   
+#   x=30,  # arrows' head
+#   y=30,  # arrows' head
+#   ax=40,  # arrows' tail
+#   ay=40,  # arrows' tail
+#   xref='x',
+#   yref='y',
+#   axref='x',
+#   ayref='y',
+#   text='',  # if you want only the arrow
+#   showarrow=T,
+#   arrowhead=3,
+#   arrowsize=1,
+#   arrowwidth=1,
+#   arrowcolor='black')
+
 fig
 ```
 
+```{r, echo=F, include=F, eval=F}
+
+# Some scratch code using tidy graph for making static graphs
+library(ggraph)
+set.seed(1)
+g <- G
+ggraph(g, 'fr') + 
+    geom_node_point() +
+    geom_edge_link() + 
+    coord_fixed()
+
+
+plt <- g %>%
+  # activate(nodes) %>% 
+  # filter(str_detect(name, "D_tetanus")) %>% 
+  ggraph('fr') + 
+  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
+  geom_node_point() + 
+  coord_fixed() +
+  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
+
+# plt
+ggsave("vaccines.png", plt, width = 30, height = 30)
+
+plt <- g %>% 
+  activate(nodes) %>% 
+  filter(str_detect(name, "D_tetanus")) %>% 
+  ggraph('fr') + 
+  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
+  geom_node_point() + 
+  coord_fixed() +
+  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
+
+ggsave("tetanus.png", plt, width = 30, height = 30)
+
+plt <- g %>% 
+  activate(nodes) %>% 
+  filter(str_detect(name, "D_measles")) %>% 
+  ggraph('fr') + 
+  geom_edge_link(arrow = arrow(angle = 20, length = unit(0.15, "inches"), ends = "last", type = "open")) +
+  geom_node_point() + 
+  coord_fixed() +
+  ggraph::geom_node_text(aes(label = display_name), repel = T, force = 100)
+
+ggsave("measles.png", plt, width = 10, height = 10)
+
+```
