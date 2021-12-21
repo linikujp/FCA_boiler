@@ -207,6 +207,64 @@ cr %>%
   
 ```
 
+
+# Create Mappings
+
+Mappings from the source codes to the new concepts are created by matching up attributes. A source code should be mapped to a concept if and only if the set of attributes associated with the source code and the set of attributes associated with the concept are the same. Some source codes are not mapped which might be an error and should be investigated further.
+
+
+```{r}
+df
+
+format_attribute <- function(x) {
+  x %>% 
+    str_trim() %>% 
+    str_replace_all("\\s|-", "_") %>% 
+    str_remove_all("\\(|\\)|,")
+}
+  
+source_code_attributes <- df %>% 
+  mutate(across(matches("^p|^m"), format_attribute)) %>% 
+  mutate(across(matches("^p"), ~str_c("D_", .))) %>% 
+  mutate(across(matches("^m"), ~str_c("M_", .))) %>% 
+  unite(col = "attribute_set", sep = "; ", matches("^p|^m"), na.rm = TRUE) %>% 
+  mutate(attribute_set = str_split(attribute_set, "; ")) %>% 
+  select(vacc_id, source_attribute_set = attribute_set) %>% 
+  # filter(vacc_id %in% unmapped_ids) %>%  # for debugging
+  {.}
+
+source_code_attributes
+  
+maps_to <- concept %>% 
+  filter(id > 0) %>% 
+  mutate(attribute_set = str_split(concept_name, "; ")) %>% 
+  select(target_concept_id = id, target_attribute_set = attribute_set) %>% 
+  # cross join
+  dplyr::full_join(source_code_attributes, by = character()) %>%
+  mutate(match = purrr::map2_lgl(target_attribute_set, source_attribute_set, setequal)) %>% 
+  # filter(purrr::map2_lgl(target_attribute_set, source_attribute_set, ~length(.x) == length(.y))) # for debugging
+  dplyr::filter(match) %>% 
+  mutate(source_attribute_set = purrr::map_chr(source_attribute_set, ~str_c(., collapse = "; "))) %>% 
+  mutate(target_attribute_set = purrr::map_chr(target_attribute_set, ~str_c(., collapse = "; "))) %>% 
+  select(vacc_id, target_concept_id, source_attribute_set, target_attribute_set)
+
+# each vaccine should be mapped to only one concept
+assertthat::are_equal(nrow(maps_to), n_distinct(maps_to$vacc_id))
+
+
+# TODO investigate why some vaccines are not mapped.
+
+# look at unmapped
+mapped_ids <- maps_to$vacc_id
+unmapped_ids <- setdiff(df2$vacc_id, mapped_ids)
+
+write_csv(maps_to, "new_vaccine_vocab_mappings.csv")
+
+
+```
+
+
+
 # Visualize Output
 
 It is helpful to visualize the graph created by the hierarchy building process.
