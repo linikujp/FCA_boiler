@@ -62,7 +62,7 @@ select concept_id as vacc_id, concept_synonym_name as vacc_name, vocabulary_id a
  when lower(concept_synonym_name) ~ 'hepatitis b|hep b' then 'hepatitis b'
  end as p5,
  case 
- when lower(concept_synonym_name) ~ 'haemophilus|hib |hibtiter' then 'haemophilus influenza'
+ when lower(concept_synonym_name) ~ 'haemophilus|hib |hibtiter' then 'haemophilus influenzae'
  when lower(concept_synonym_name) ~ 'parainfluenza' then 'parainfluenza'
  when lower(concept_synonym_name) ~ 'influenza' then 'influenza'
  when lower(concept_synonym_name) ~ 'yellow fever' then 'yellow fever'
@@ -131,7 +131,7 @@ select concept_id as vacc_id, concept_synonym_name as vacc_name, vocabulary_id a
  when lower(concept_synonym_name) ~ 'hepatitis b|hep b' and lower(concept_synonym_name)~ 'recombinant' then 'hepatitis b recombinant'
  end as m5,
  case 
- when lower(concept_synonym_name) ~ 'haemophilus|hib ' and lower(concept_synonym_name) ~ 'conjugate' then 'haemophilus influenza conjugate'
+ when lower(concept_synonym_name) ~ 'haemophilus|hib ' and lower(concept_synonym_name) ~ 'conjugate' then 'haemophilus influenzae conjugate'
  when lower(concept_synonym_name) ~ 'influenza' and lower(concept_synonym_name)~ 'live' then 'influenza live'
  when lower(concept_synonym_name) ~ 'influenza' and lower(concept_synonym_name)~ 'recomb' then 'influenza recomb'
  --when lower(concept_synonym_name) ~ 'yellow fever' then 'yellow fever'
