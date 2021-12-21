@@ -214,8 +214,6 @@ Mappings from the source codes to the new concepts are created by matching up at
 
 
 ```{r}
-df
-
 format_attribute <- function(x) {
   x %>% 
     str_trim() %>% 
@@ -233,8 +231,6 @@ source_code_attributes <- df %>%
   # filter(vacc_id %in% unmapped_ids) %>%  # for debugging
   {.}
 
-source_code_attributes
-  
 maps_to <- concept %>% 
   filter(id > 0) %>% 
   mutate(attribute_set = str_split(concept_name, "; ")) %>% 
@@ -260,7 +256,7 @@ unmapped_ids <- setdiff(df2$vacc_id, mapped_ids)
 
 write_csv(maps_to, "new_vaccine_vocab_mappings.csv")
 
-
+maps_to
 ```
 
 
